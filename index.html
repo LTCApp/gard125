@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>تطبيق مسح الباركود المتطور - إدارة المخزون</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#dc2626">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="تطبيق متطور لمسح الباركود وإدارة المخزون مع ميزات ذكية">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1>📱 مسح الباركود المتطور</h1>
+                <p>إدارة المخزون الذكية والاحترافية</p>
+            </div>
+        </header>
+
+        <!-- Camera Section -->
+        <div class="camera-section">
+            <div class="camera-container">
+                <video id="video" autoplay muted playsinline></video>
+                <canvas id="canvas" style="display: none;"></canvas>
+                <div class="scanner-overlay">
+                    <div class="scanner-line"></div>
+                </div>
+            </div>
+            
+            <div class="camera-controls">
+                <button id="startCamera" class="btn btn-primary">
+                    📷 تشغيل الكاميرا
+                </button>
+                <button id="stopCamera" class="btn btn-secondary" style="display: none;">
+                    ⏹️ إيقاف الكاميرا
+                </button>
+                <button id="toggleFlash" class="btn btn-flash" style="display: none;">
+                    💡 تشغيل الفلاش
+                </button>
+            </div>
+        </div>
+
+        <!-- Voice Input Section (مخفي لأن العملية أصبحت تلقائية) -->
+        <div class="voice-section" id="voiceSection" style="display: none;">
+            <div class="voice-container">
+                <div class="voice-icon">🎤</div>
+                <h3>جاري الاستماع للكمية...</h3>
+                <div class="voice-status" id="voiceStatus">جاري التعرف على الصوت...</div>
+            </div>
+        </div>
+
+        <!-- Quantity Input Fallback (للأجهزة التي لا تدعم التعرف على الصوت) -->
+        <div class="quantity-input-section" id="quantityInputFallback" style="display: none;">
+            <div class="quantity-container">
+                <h3>إدخال الكمية</h3>
+                <p>المنتج: <span id="productNameFallback"></span></p>
+                <div class="quantity-input-group">
+                    <input type="number" id="quantityNumber" placeholder="أدخل الكمية" min="1">
+                    <button onclick="app.submitManualQuantity()" class="btn btn-primary">تأكيد</button>
+                    <button onclick="app.cancelManualQuantity()" class="btn btn-secondary">إلغاء</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirmation Section -->
+        <div class="confirmation-section" id="confirmationSection" style="display: none;">
+            <div class="confirmation-container">
+                <h3>تأكيد البيانات</h3>
+                <div class="product-info">
+                    <div class="info-item">
+                        <span class="label">اسم المنتج:</span>
+                        <span class="value" id="productName"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">الكمية:</span>
+                        <span class="value" id="productQuantity"></span>
+                    </div>
+                </div>
+                <div class="confirmation-timer">
+                    <div class="timer-circle">
+                        <span id="timerCount">5</span>
+                    </div>
+                    <p>سيتم الإضافة تلقائياً خلال <span id="timerText">5</span> ثواني</p>
+                </div>
+                <div class="confirmation-buttons">
+                    <button id="confirmAdd" class="btn btn-success">
+                        ✅ تأكيد الإضافة
+                    </button>
+                    <button id="cancelAdd" class="btn btn-cancel">
+                        ❌ إلغاء
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products List -->
+        <div class="products-section">
+            <div class="products-header">
+                <h3>📋 قائمة المنتجات المضافة</h3>
+                <div class="products-controls">
+                    <button id="exportData" class="btn btn-export">
+                        📊 تصدير Excel
+                    </button>
+                    <button id="deleteAll" class="btn btn-delete-all">
+                        🗑️ حذف الكل
+                    </button>
+                </div>
+            </div>
+            <div class="products-list" id="productsList">
+                <div class="empty-state">
+                    <div class="empty-icon">📦</div>
+                    <p>لم يتم إضافة أي منتجات بعد</p>
+                    <small>قم بمسح الباركود لبدء الإضافة</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Source Section (مبسط لأن المسار أصبح ثابت) -->
+        <div class="upload-section">
+            <h3>📁 حالة البيانات</h3>
+            <div class="upload-container">
+                <!-- إشعار التحديث -->
+                <div id="update-notification" class="update-notification hidden">
+                    <div class="notification-content">
+                        <div class="notification-icon">🔔</div>
+                        <div class="notification-text">
+                            <h4>تحديث متاح</h4>
+                            <p>يتوفر إصدار جديد من البيانات</p>
+                        </div>
+                        <div class="notification-actions">
+                            <button id="updateNow" class="btn btn-primary">تحديث الآن</button>
+                            <button id="dismissUpdate" class="btn btn-secondary">لاحقاً</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-controls">
+                    <button id="refreshData" class="btn btn-secondary">
+                        🔄 إعادة تحميل البيانات
+                    </button>
+                </div>
+                <div class="file-status" id="fileStatus">
+                    <div class="status-icon">⏳</div>
+                    <div class="status-text">جاري التحقق من البيانات المحفوظة...</div>
+                </div>
+                <div class="data-stats" id="dataStats" style="display: none;"></div>
+                <div class="sync-status" id="syncStatus" style="display: none;">
+                    <small>آخر تحقق من التحديثات: <span id="lastSyncTime">غير محدد</span></small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete All Confirmation Modal -->
+        <div id="deleteAllModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4>⚠️ تأكيد حذف جميع المنتجات</h4>
+                </div>
+                <div class="modal-body">
+                    <p>هذا الإجراء سيحذف جميع المنتجات المسحوبة نهائياً</p>
+                    <p><strong>أدخل الرقم السري للتأكيد:</strong></p>
+                    <input type="password" id="secretCodeInput" placeholder="أدخل الرقم السري" class="secret-input">
+                    <small>الرقم السري المطلوب: 01470449</small>
+                </div>
+                <div class="modal-footer">
+                    <button id="confirmDeleteAll" class="btn btn-danger">🗑️ حذف نهائي</button>
+                    <button id="cancelDeleteAll" class="btn btn-secondary">إلغاء</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Messages -->
+        <div class="status-container" id="statusContainer"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/quagga@0.12.1/dist/quagga.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

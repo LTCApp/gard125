@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خادم اختبار ملف Excel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background: #f5f5f5;
+            direction: rtl;
+            text-align: right;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #dc3545;
+            text-align: center;
+        }
+        .file-info {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #28a745;
+        }
+        .download-link {
+            display: block;
+            background: #dc3545;
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+            margin: 10px 0;
+            transition: background 0.3s;
+        }
+        .download-link:hover {
+            background: #c82333;
+        }
+        .test-url {
+            background: #f8f9fa;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: monospace;
+            direction: ltr;
+            text-align: left;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗄️ خادم اختبار ملف Excel</h1>
+        
+        <div class="file-info">
+            <h3>📊 ملف البيانات التجريبي</h3>
+            <p><strong>اسم الملف:</strong> sample_products.xlsx</p>
+            <p><strong>عدد المنتجات:</strong> 15 منتج</p>
+            <p><strong>حجم الملف:</strong> ~8 كيلوبايت</p>
+            <p><strong>آخر تحديث:</strong> <span id="lastUpdate"></span></p>
+        </div>
+
+        <h3>🔗 روابط التحميل للاختبار:</h3>
+        
+        <div class="test-url" id="localUrl">جاري تحديد الرابط...</div>
+        
+        <a href="sample_products.xlsx" class="download-link" download>
+            📥 تحميل ملف Excel التجريبي
+        </a>
+        
+        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid #ffc107; margin: 20px 0;">
+            <h4>⚠️ تعليمات الاستخدام:</h4>
+            <ol>
+                <li>انسخ الرابط أعلاه</li>
+                <li>الصقه في حقل "رابط ملف Excel" في التطبيق</li>
+                <li>اضغط "تحميل البيانات"</li>
+                <li>ابدأ مسح الباركود باستخدام هذه الأكواد التجريبية:</li>
+            </ol>
+        </div>
+
+        <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <h4>🏷️ أكواد باركود للاختبار:</h4>
+            <ul>
+                <li><code>1234567890123</code> - شامبو هيد أند شولدرز</li>
+                <li><code>9876543210987</code> - معجون أسنان كولجيت</li>
+                <li><code>1111222233334</code> - صابون لوكس</li>
+                <li><code>4444555566667</code> - كريم نيفيا</li>
+                <li><code>7777888899990</code> - شاي ليبتون</li>
+            </ul>
+        </div>
+
+        <div style="background: #f8d7da; padding: 15px; border-radius: 8px; border-left: 4px solid #dc3545; margin: 20px 0;">
+            <h4>⚡ ملاحظات مهمة:</h4>
+            <ul>
+                <li>هذا خادم تجريبي محلي فقط</li>
+                <li>للاستخدام الفعلي، ارفع الملف على خادم حقيقي</li>
+                <li>تأكد من أن الخادم يدعم HTTPS و CORS</li>
+                <li>راجع ملف SERVER_SETUP.md للتفاصيل</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // تحديث الرابط المحلي
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUrl = window.location.href;
+            const fileUrl = currentUrl.replace('/test.html', '/sample_products.xlsx');
+            document.getElementById('localUrl').textContent = fileUrl;
+            
+            // تحديد وقت آخر تحديث
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleString('ar-EG');
+        });
+    </script>
+</body>
+</html>
